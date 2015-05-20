@@ -19,9 +19,9 @@ def get_redirect_url(request):
         get.update({ FLD: request.build_absolute_uri(request.path_info) })
         request.GET = get
     
-    return urllib.quote(u"{request_url}?{query_string}".format(
+    return urllib.parse.quote(u"{request_url}?{query_string}".format(
         request_url  = request.build_absolute_uri(r('ulogin_postback')),
-        query_string = urllib.unquote(request.GET.urlencode())
+        query_string = urllib.parse.unquote(request.GET.urlencode())
         ))
 
 def ulogin_widget(context):

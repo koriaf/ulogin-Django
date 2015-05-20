@@ -1,6 +1,10 @@
 # -*- coding: utf-8 -*-
 
-from django.conf.urls.defaults import url, patterns
+try:
+    from django.conf.urls.defaults import url, patterns
+except ImportError:
+    from django.conf.urls import patterns, url
+
 
 urlpatterns = patterns('django_ulogin.views',
     url('^postback/$', 'postback', name='ulogin_postback'),

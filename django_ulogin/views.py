@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+import json
+import zlib
 
 from django.contrib.auth import login
 from django.http import HttpResponseNotAllowed, HttpResponseBadRequest
@@ -6,7 +8,7 @@ from django.contrib.auth import REDIRECT_FIELD_NAME
 from django.contrib.auth.models import User
 from django.shortcuts import redirect
 from django.views.decorators.csrf import csrf_exempt
-from django.utils import simplejson
+# from django.utils import simplejson
 from django_ulogin import settings
 from django_ulogin.models import ULoginUser
 from django_ulogin.signals import assign
@@ -21,10 +23,16 @@ except ImportError:
 def ulogin_response(token, host):
     """
     """
-    return simplejson.loads(requests.get(settings.TOKEN_URL, params={
-                               'token' : token,
-                               'host'  : host
-                           }).content)
+    resp = requests.get(settings.TOKEN_URL, stream=True, params={
+        'token': token,
+        'host': host
+    })
+    enc = resp.headers['Content-Encoding']
+    if enc == 'gzip':
+        resp = zlib.decompress(resp.raw.read(), 16+zlib.MAX_WBITS)
+    else:
+        resp = resp.text
+    return json.loads(resp.decode())
 
 @csrf_exempt
 def postback(request):
